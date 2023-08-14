@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Loan Payment Calculator</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  .section {
+    margin-bottom: 20px;
+  }
+  .input-label {
+    display: block;
+    margin-bottom: 5px;
+    margin-top: 10px;
+  }
+  .input-field {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  .calculate-button {
+    margin: 10px;
+    padding: 10px 20px;
+    text-align: center;
+    
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 700;
+    border: none;
+    border-radius: 20px;
+    background: linear-gradient(0deg, #f901fe 0%, #01fef9 100%);
+  }
+  .output {
+    font-weight: bold;
+    margin-top: 10px;
+  }
+  .table{
+    overflow-x: scroll;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  th, td {
+    padding: 8px;
+    border: 1px solid #212121;
+    text-align: left;
+  }
+  
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="section">
+    <h2>Loan Payment Calculator</h2>
+    <div>
+      <label class="input-label" for="loanAmount">Loan Amount:</label>
+      <input class="input-field" type="number" id="loanAmount" value="100000" placeholder="Loan amount" required>
+    </div>
+    <div>
+      <label class="input-label" for="interestRate">Interest Rate (%):</label>
+      <input class="input-field" type="number" id="interestRate" value="6" placeholder="Interest rate" required>
+    </div>
+    <div>
+      <label class="input-label" for="loanTerm">Loan Term (years):</label>
+      <input class="input-field" type="number" id="loanTerm" value="10" placeholder="Loan term" required>
+    </div>
+    <button class="calculate-button" onclick="calculateLoan()">Calculate</button>
+  </div>
+  <div class="section">
+    <h2>Loan Payment Results</h2>
+    <p class="output" id="monthlyPayment"></p>
+    <p class="output" id="totalPayment"></p>
+    <p class="output" id="totalInterest"></p>
+  </div>
+  <div class="section table">
+    <h2>Amortization Schedule</h2>
+    <table id="amortizationTable">
+      <thead>
+        <tr>
+          <th>Month</th>
+          <th>Payment</th>
+          <th>Principal</th>
+          <th>Interest</th>
+          <th>Balance</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  function calculateLoan() {
+    const loanAmount = parseFloat(document.getElementById('loanAmount').value);
+    const interestRate = parseFloat(document.getElementById('interestRate').value) / 100;
+    const loanTerm = parseFloat(document.getElementById('loanTerm').value) * 12;
+
+    const monthlyInterestRate = interestRate / 12;
+    const monthlyPayment = (loanAmount * monthlyInterestRate) / (1 - Math.pow(1 + monthlyInterestRate, -loanTerm));
+    const totalPayment = monthlyPayment * loanTerm;
+    const totalInterest = totalPayment - loanAmount;
+
+    document.getElementById('monthlyPayment').textContent = `Monthly Payment: $${monthlyPayment.toFixed(2)}`;
+    document.getElementById('totalPayment').textContent = `Total Payment: $${totalPayment.toFixed(2)}`;
+    document.getElementById('totalInterest').textContent = `Total Interest: $${totalInterest.toFixed(2)}`;
+
+    const tableBody = document.querySelector('#amortizationTable tbody');
+    tableBody.innerHTML = '';
+
+    let balance = loanAmount;
+    for (let month = 1; month <= loanTerm; month++) {
+      const interest = balance * monthlyInterestRate;
+      const principal = monthlyPayment - interest;
+      balance -= principal;
+      
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${month}</td>
+        <td>$${monthlyPayment.toFixed(2)}</td>
+        <td>$${principal.toFixed(2)}</td>
+        <td>$${interest.toFixed(2)}</td>
+        <td>$${balance.toFixed(2)}</td>
+      `;
+      tableBody.appendChild(row);
+    }
+  }
+</script>
+</body>
+</html>
